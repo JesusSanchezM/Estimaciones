@@ -55,6 +55,7 @@ Escolaridad_2019 <- SDEM_2019 %>%
   arrange(desc(suma_factor_expansion))
 
 Escolaridad_2020 <- SDEM_2020 %>%
+  filter(eda>=25) %>%
   group_by(cs_p13_1) %>%
   summarise(suma_factor_expansion = sum(fac, na.rm = TRUE)) %>%
   left_join(niveles_escolaridad, by = "cs_p13_1") %>%
