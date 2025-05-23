@@ -16,13 +16,13 @@
 #-----------------------------------
 
 {
-  SDEM_2018 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestría BUAP - Economía/0. TESIS/Datos/ENOE_datos/2018trim1_csv/SDEMT118.csv", header=T)
-  SDEM_2019 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestría BUAP - Economía/0. TESIS/Datos/ENOE_datos/2019trim1_csv/sdemt119.csv")
-  SDEM_2020 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestría BUAP - Economía/0. TESIS/Datos/ENOE_datos/2020trim1_csv/ENOE_SDEMT120.csv")
-  SDEM_2021 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestría BUAP - Economía/0. TESIS/Datos/ENOE_datos/enoe_n_2021_trim1_csv/ENOEN_SDEMT121.csv")
-  SDEM_2022 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestría BUAP - Economía/0. TESIS/Datos/ENOE_datos/enoe_n_2022_trim1_csv/ENOEN_SDEMT122.csv")
-  SDEM_2023 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestría BUAP - Economía/0. TESIS/Datos/ENOE_datos/enoe_2023_trim1_csv/ENOE_SDEMT123.csv")
-  SDEM_2024 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestría BUAP - Economía/0. TESIS/Datos/ENOE_datos/enoe_2024_trim1_csv/ENOE_SDEMT124.csv")
+  SDEM_2018 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENOE_datos/2018trim1_csv/SDEMT118.csv", header=T)
+  SDEM_2019 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENOE_datos/2019trim1_csv/sdemt119.csv")
+  SDEM_2020 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENOE_datos/2020trim1_csv/ENOE_SDEMT120.csv")
+  SDEM_2021 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENOE_datos/enoe_n_2021_trim1_csv/ENOEN_SDEMT121.csv")
+  SDEM_2022 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENOE_datos/enoe_n_2022_trim1_csv/ENOEN_SDEMT122.csv")
+  SDEM_2023 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENOE_datos/enoe_2023_trim1_csv/ENOE_SDEMT123.csv")
+  SDEM_2024 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENOE_datos/enoe_2024_trim1_csv/ENOE_SDEMT124.csv")
   
 }
 
@@ -39,6 +39,7 @@ niveles_escolaridad <- tibble(
 
 # Agrupar, sumar y unir con etiquetas
 Escolaridad_2018 <- SDEM_2018 %>%
+  filter(eda>=25) %>% 
   group_by(cs_p13_1) %>%
   summarise(suma_factor_expansion = sum(fac, na.rm = TRUE)) %>%
   left_join(niveles_escolaridad, by = "cs_p13_1") %>%
@@ -46,6 +47,7 @@ Escolaridad_2018 <- SDEM_2018 %>%
   arrange(desc(suma_factor_expansion))
 
 Escolaridad_2019 <- SDEM_2019 %>%
+  filter(eda>=25) %>%
   group_by(cs_p13_1) %>%
   summarise(suma_factor_expansion = sum(fac, na.rm = TRUE)) %>%
   left_join(niveles_escolaridad, by = "cs_p13_1") %>%
@@ -60,6 +62,7 @@ Escolaridad_2020 <- SDEM_2020 %>%
   arrange(desc(suma_factor_expansion))
 
 Escolaridad_2021 <- SDEM_2021 %>%
+  filter(eda>=25) %>%
   group_by(cs_p13_1) %>%
   summarise(suma_factor_expansion = sum(fac_tri, na.rm = TRUE)) %>%
   left_join(niveles_escolaridad, by = "cs_p13_1") %>%
@@ -67,6 +70,7 @@ Escolaridad_2021 <- SDEM_2021 %>%
   arrange(desc(suma_factor_expansion))
 
 Escolaridad_2022 <- SDEM_2022 %>%
+  filter(eda>=25) %>%
   group_by(cs_p13_1) %>%
   summarise(suma_factor_expansion = sum(fac_tri, na.rm = TRUE)) %>%
   left_join(niveles_escolaridad, by = "cs_p13_1") %>%
@@ -74,6 +78,7 @@ Escolaridad_2022 <- SDEM_2022 %>%
   arrange(desc(suma_factor_expansion))
 
 Escolaridad_2023 <- SDEM_2023 %>%
+  filter(eda>=25) %>%
   group_by(cs_p13_1) %>%
   summarise(suma_factor_expansion = sum(fac_tri, na.rm = TRUE)) %>%
   left_join(niveles_escolaridad, by = "cs_p13_1") %>%
@@ -81,6 +86,7 @@ Escolaridad_2023 <- SDEM_2023 %>%
   arrange(desc(suma_factor_expansion))
 
 Escolaridad_2024 <- SDEM_2024 %>%
+  filter(eda>=25) %>%
   group_by(cs_p13_1) %>%
   summarise(suma_factor_expansion = sum(fac_tri, na.rm = TRUE)) %>%
   left_join(niveles_escolaridad, by = "cs_p13_1") %>%
@@ -200,7 +206,7 @@ ggplot(
     ),
   aes(x = anio, y = variacion_pct, color = nivel_escolaridad)
 ) +
-  geom_line(size = 1) +
+  geom_line(size = 2) +
   geom_point() +
   labs(
     title = "Cambio porcentual anual por nivel de escolaridad (2019–2024)",
