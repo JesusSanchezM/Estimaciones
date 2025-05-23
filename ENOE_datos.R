@@ -335,7 +335,7 @@ Asistencia_todos <- Asistencia_todos |>
 
 
 
-  ggplot(data=Asistencia_todos, aes(x = cs_p17_rotulo, y = suma_factor_expansion, fill = factor(anio))) +
+ggplot(data=Asistencia_todos, aes(x = cs_p17_rotulo, y = suma_factor_expansion, fill = factor(anio))) +
   geom_col(position = "dodge", color="black") +
   labs(
     title = "Asistencia por año y tipo de respuesta",
@@ -344,12 +344,8 @@ Asistencia_todos <- Asistencia_todos |>
     fill = "Año"
   ) +
   theme_classic()
-
-  library(ggplot2)
-  library(dplyr)
-  library(scales)
   
-  Asistencia_todos |>
+Asistencia_todos |>
     filter(cs_p17 != 9) |>
     mutate(
       cs_p17_rotulo = recode(cs_p17,
