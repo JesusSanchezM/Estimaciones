@@ -22,8 +22,22 @@ datos <- tibble::tibble(
   )
 )
 
+datos <- datos |>
+  mutate(
+    nivel = factor(
+      nivel,
+      levels = c(
+        "Tertiary education",
+        "Upper secondary or post-secondary non-tertiary education",
+        "Below upper secondary education"
+      )
+    )
+  )
+
+
 tema_grafico <- theme_classic(base_size = 13) +
   theme(legend.position = "top")
+
 
 etiquetas <- geom_text(
   aes(label = sprintf("%.2f", valor)),
@@ -43,6 +57,63 @@ datos |>
     x = "Año", y = "Porcentaje", fill = "Nivel educativo"
   ) +
   tema_grafico
+
+
+
+datos_pos <- datos |>
+  group_by(país, año) |>
+  arrange(país, año, desc(nivel)) |>
+  mutate(
+    pos = cumsum(valor) - valor / 2,
+    etiqueta = sprintf("%.2f%%", valor)
+  )
+
+
+datos_pos |> 
+  filter(país == "México") |>
+  ggplot(aes(x = factor(año), y = valor, fill = nivel)) +
+  geom_bar(stat = "identity", color="black", size=1) +
+  geom_text(aes(y = pos, label = etiqueta), color = "white", size = 4) +
+  labs(
+    title = "Distribución apilada del nivel educativo en México (2018–2023)",
+    x = "Año", y = "Porcentaje total", fill = "Nivel educativo"
+  ) +
+  theme_classic()
+
+
+datos_pos |> 
+  filter(país == "OCDE") |>
+  ggplot(aes(x = factor(año), y = valor, fill = nivel)) +
+  geom_bar(stat = "identity", , color="black", size=1) +
+  geom_text(aes(y = pos, label = etiqueta), color = "white", size = 4) +
+  labs(
+    title = "Distribución apilada del nivel educativo en países OCDE (2018–2023)",
+    x = "Año", y = "Porcentaje total", fill = "Nivel educativo"
+  ) +
+  theme_classic()
+
+
+ggplot(datos_pos, aes(x = factor(año), y = valor, fill = nivel)) +
+  geom_bar(stat = "identity", color="black", size=1) +
+  geom_text(aes(y = pos, label = etiqueta), color = "white", size = 3.5) +
+  facet_wrap(~ país) +
+  labs(
+    title = "Distribución educativa apilada: México vs OCDE (2018–2023)",
+    x = "Año", y = "Porcentaje total", fill = "Nivel educativo"
+  ) +
+  theme_classic() +
+  theme(legend.position = "top")
+
+
+
+
+
+
+
+
+
+
+
 
 
 
