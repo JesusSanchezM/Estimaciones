@@ -1,5 +1,5 @@
 library(tidyverse)
-
+ 
 # Crear datos largos con error estándar
 datos <- tibble::tibble(
   país   = rep(c("México", "OCDE"), each = 18),
