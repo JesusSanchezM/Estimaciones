@@ -134,39 +134,57 @@ Escolaridad_filtrada$nivel_escolaridad <- factor(
 # Crear gráfico con formato de miles
 
 ggplot(data = Escolaridad_filtrada, aes(x = nivel_escolaridad, y = proporcion, fill = factor(anio))) +
-  geom_bar(stat = "identity", position = "dodge", color="black") +
+  geom_bar(stat = "identity", position = "dodge", color="black", size=1) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   labs(
-    title = "Proporción por nivel de escolaridad (2018–2024)",
+    title = "Gráfica 2: Proporción por nivel de escolaridad (2018–2024)",
     x = "Nivel de escolaridad",
     y = "Proporción (%)",
-    fill = "Año"
+    fill = "Año", 
+    subtitle = "(Porcentaje)",
+    caption = "Fuente: Elaboración propia con datos de INEGI. Encuesta de Ocupación y Empleo (ENOE) Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población mayor a 25 años"
+    
   ) +
   theme_classic() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    text = element_text(size = 12)
-  )
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 14),
+    plot.subtitle = element_text(hjust = 0.5, size = 10),
+    plot.caption = element_text(hjust = 0, size = 8, color = "gray40"),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  ) 
+
+
+
+
+
 
 Escolaridad_filtrada %>%
-  filter(nivel_escolaridad %in% c("Preparatoria o bachillerato", "Profesional", "Carrera técnica")) %>%
+  filter(nivel_escolaridad %in% c("Preparatoria o bachillerato", "Profesional", "Normal", "Carrera técnica")) %>%
   ggplot(aes(x = nivel_escolaridad, y = proporcion, fill = factor(anio))) +
-  geom_bar(stat = "identity", position = "dodge", color = "black") +
+  geom_bar(stat = "identity", position = "dodge", color = "black", size=1) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   labs(
-    title = "Proporción por nivel de escolaridad (2018–2024)",
+    title = "Gráfica 3: Proporción por nivel de escolaridad (2018–2024)",
     x = "Nivel de escolaridad",
     y = "Proporción (%)",
-    fill = "Año"
+    fill = "Año", 
+    subtitle = "(Porcentaje)",
+    caption = "Fuente: Elaboración propia con datos de INEGI. Encuesta de Ocupación y Empleo (ENOE) Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población mayor a 25 años"
   ) +
   theme_classic() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    text = element_text(size = 12)
-  )
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 14),
+    plot.subtitle = element_text(hjust = 0.5, size = 10),
+    plot.caption = element_text(hjust = 0, size = 8, color = "gray40"),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  ) 
 
 
-
+{
 # Calcular el cambio porcentual por nivel y año
 variaciones_porcentuales <- Escolaridad_todos %>%
   filter(!is.na(nivel_escolaridad), nivel_escolaridad != "No sabe nivel") %>%
@@ -273,7 +291,7 @@ tabla_horizontal %>%
     table.font.size = "small",
     heading.align = "left"
   )
-
+}
 
 #ASISTENCIA ESCOLAR 
 
@@ -362,13 +380,24 @@ Asistencia_todos |>
     ggplot(aes(x = cs_p17_rotulo, y = suma_factor_expansion, fill = factor(anio))) +
     geom_col(position = "dodge", color = "black", size=1) +
     labs(
-      title = "Asistencia por año y tipo de respuesta",
       x = "Respuesta",
       y = "Total ponderado",
-      fill = "Año"
+      fill = "Año",
+      title = "Gráfica 4: Asistencia por año y tipo de respuesta (2018–2024)",
+      subtitle = "(Población)",
+      caption = "Fuente: Elaboración propia con datos de INEGI. Encuesta de Ocupación y Empleo (ENOE) Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población mayor a 25 años"
     ) +
     scale_y_continuous(labels = label_comma()) +
-    theme_classic()
+    theme_classic() +  
+  theme(
+      plot.title = element_text(face = "bold", hjust = 0.5, size = 14),
+      plot.subtitle = element_text(hjust = 0.5, size = 10),
+      plot.caption = element_text(hjust = 0, size = 8, color = "gray40"),
+      legend.position = "bottom",
+      legend.title = element_text(face = "bold"),
+      axis.text.x = element_text(angle = 45, hjust = 1)
+    ) 
+
   
 
 
