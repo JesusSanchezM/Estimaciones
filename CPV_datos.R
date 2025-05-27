@@ -37,9 +37,9 @@ ggplot(datos_escolarizacion_long, aes(x = Grupo, y = Porcentaje, fill = Grupo)) 
   
   # Personalización al estilo de tu gráfico
   labs(
-    title = "Porcentaje de la población de 3 a 24 años que asiste a la escuela por grupo de edad (2020)",
+    title = "Gráfica 1: Porcentaje de la población de 3 a 24 años que asiste a la escuela por grupo de edad (2020)",
     subtitle = "Porcentaje",
-    caption = "Fuente: INEGI. Censo de Población y Vivienda 2020\nDatos procesados el 25/05/2025",
+    caption = "Fuente: Elaboración propia con datos de INEGI. Censo de Población y Vivienda 2020\nDatos procesados el 25/05/2025",
     x = "Grupo de edad",
     y = "Porcentaje escolarizado",
     fill = "Grupo de edad"

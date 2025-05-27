@@ -8,6 +8,7 @@
   library(tidyverse)
   library(scales)  # Para label_comma()
   library(gt)
+  library(forcats)
   
 }
 
@@ -131,9 +132,12 @@ Escolaridad_filtrada$nivel_escolaridad <- factor(
   )
 )
 
+{
 # Crear gráfico con formato de miles
 
-ggplot(data = Escolaridad_filtrada, aes(x = nivel_escolaridad, y = proporcion, fill = factor(anio))) +
+Escolaridad_filtrada %>% 
+  filter(nivel_escolaridad %in% c("Ninguno", "Preescolar","Primaria", "Secundaria","Preparatoria o bachillerato", "Carrera técnica", "Normal", "Profesional")) %>%
+  ggplot(aes(x = nivel_escolaridad, y = proporcion, fill = factor(anio))) +
   geom_bar(stat = "identity", position = "dodge", color="black", size=1) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   labs(
@@ -182,6 +186,56 @@ Escolaridad_filtrada %>%
     legend.title = element_text(face = "bold"),
     axis.text.x = element_text(angle = 45, hjust = 1)
   ) 
+
+
+
+}
+
+
+# Procesamiento de datos
+Escolaridad_ordenada <- Escolaridad_filtrada %>%
+  filter(!nivel_escolaridad %in% c("Maestría", "Doctorado")) %>%
+  mutate(grupo_escolaridad = case_when(
+    nivel_escolaridad %in% c("Ninguno") ~ "1. Ninguno",
+    nivel_escolaridad %in% c("Preescolar", "Primaria", "Secundaria") ~ "2. Menor a preparatoria",
+    nivel_escolaridad %in% c("Preparatoria o bachillerato", "Normal") ~ "3. Preparatoria y normal",
+    nivel_escolaridad %in% c("Carrera técnica", "Profesional") ~ "4. Carrera técnica y profesional",
+    TRUE ~ as.character(nivel_escolaridad)
+  )) %>%
+    # Convertimos a factor ordenado
+    mutate(grupo_escolaridad = fct_relevel(grupo_escolaridad, 
+                                           "1. Ninguno",
+                                           "2. Menor a preparatoria",
+                                           "3. Preparatoria y normal",
+                                           "4. Carrera técnica y profesional")) %>%
+    group_by(anio, grupo_escolaridad) %>%
+    summarise(suma_total = sum(suma_factor_expansion),
+              proporcion_total = sum(proporcion),
+              .groups = 'drop')
+  
+  # Creamos el gráfico con el orden específico
+  ggplot(Escolaridad_ordenada, aes(x = factor(anio), y = proporcion_total, 
+                                   fill = grupo_escolaridad)) +
+    geom_bar(stat = "identity", position = "stack", color="black", size=1) +
+    labs(title = "Gráfica 2: Distribución de Niveles de Escolaridad por Año",
+         subtitle = "(Porcentaje de la población mayor a 25 años)",
+         x = "Año",
+         y = "Proporción",
+         fill = "Nivel de Escolaridad", 
+         caption = "Elaboración propia con datos de la Encuesta Nacional de Ocupación y Empleo (ENOE) \nNota: Se excluyen los datos de Maestría y Doctorado") +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+    scale_fill_manual(values = c("#FF69B4", "#00BFFF", "mediumpurple", "#FFA07A")) +  # Colores distintivos
+    theme_classic() +
+    theme(
+      plot.title = element_text(face = "bold", hjust = 0.5, size = 14),
+      plot.subtitle = element_text(hjust = 0.5, size = 10),
+      plot.caption = element_text(hjust = 0, size = 8, color = "gray40"),
+      legend.position = "bottom",
+      legend.title = element_text(face = "bold"),
+      axis.text.x = element_text(angle = 45, hjust = 1)
+    ) 
+
+
 
 
 {
@@ -383,9 +437,9 @@ Asistencia_todos |>
       x = "Respuesta",
       y = "Total ponderado",
       fill = "Año",
-      title = "Gráfica 4: Asistencia por año y tipo de respuesta (2018–2024)",
+      title = "Gráfica 3: Asistencia por año y tipo de respuesta (2018–2024)",
       subtitle = "(Población)",
-      caption = "Fuente: Elaboración propia con datos de INEGI. Encuesta de Ocupación y Empleo (ENOE) Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población mayor a 25 años"
+      caption = "Fuente: Elaboración propia con datos de INEGI. Encuesta de Ocupación y Empleo (ENOE) Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población de entre 15 y 24 años"
     ) +
     scale_y_continuous(labels = label_comma()) +
     theme_classic() +  

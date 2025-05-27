@@ -119,7 +119,7 @@ datos_pos |>
   geom_bar(stat = "identity", color="black", size=1) +
   geom_text(aes(y = pos, label = etiqueta), color = "white", size = 2.5) +
   labs(
-    title = "Gráfica 5: Distribución apilada del nivel educativo en México (2005–2023)",
+    title = "Gráfica 4: Distribución apilada del nivel educativo en México (2005–2023)",
     subtitle = "Porcentaje de población por nivel de educación alcanzado",
     x = "Año", 
     y = "Porcentaje total", 
@@ -168,7 +168,7 @@ ggplot(datos_pos, aes(x = factor(año), y = valor, fill = nivel)) +
   geom_bar(stat = "identity", color="black", size=1) + 
   facet_wrap(~ país) +
   labs(
-    title = "Gráfica 6: Distribución educativa apilada: México vs OCDE (2005–2023)",
+    title = "Gráfica 5: Distribución educativa apilada: México vs OCDE (2005–2023)",
     x = "Año", y = "Porcentaje total", fill = "Nivel educativo",
     subtitle = "Porcentaje de población por nivel de educación alcanzado",
     caption = "Fuente: Elaboración propia con datos de la OCDE. Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población de 25-64 años"
@@ -243,7 +243,7 @@ ggplot(Ocde_world_2023_long, aes(x = `Reference area`, y = porcentaje, fill = ni
     show.legend = FALSE
   )+
   labs(
-    title = "Gráfica 7: Nivel educativo en países OCDE y seleccionados (2023)",    
+    title = "Gráfica 6: Nivel educativo en países OCDE y seleccionados (2023)",    
     subtitle = "Porcentaje de población por nivel de educación alcanzado",
     caption = "Fuente: Elaboración propia con datos de la OCDE. Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población de 25-64 años",
     x = "País",
@@ -282,7 +282,7 @@ ggplot(Ocde_bank_world_2023,
        aes(x = `Tertiary education`, y = `GDP Per capita`)) +
   geom_point(color = "blue", size = 3, alpha = 0.7) +
   geom_smooth(method = "lm", color = "red", se = TRUE) +
-  labs(title = "Gráfica 8: Relación entre educación terciaria y PIB per cápita",
+  labs(title = "Gráfica 7: Relación entre educación terciaria y PIB per cápita",
        subtitle = "A precios constantes de 2015 en dolares ", 
        x = "Porcentaje con educación terciaria",
        y = "PIB per cápita (USD)",
@@ -338,7 +338,7 @@ ggplot(Ocde_bank_world_2023,
   geom_boxplot(alpha = 0.7) +
   geom_jitter(width = 0.1, color = "black", size = 2) +
   scale_fill_brewer(palette = "RdYlGn", direction = -1) +
-  labs(title = "Gráfica 8: Distribución del PIB per cápita por nivel de educación inferior",
+  labs(title = "Gráfica 7: Distribución del PIB per cápita por nivel de educación inferior",
        x = "Grupo según % de población con educación inferior",
        y = "PIB per cápita (USD)",
        caption = "Q1: Países con menor % de baja educación\nQ4: Países con mayor %") +
