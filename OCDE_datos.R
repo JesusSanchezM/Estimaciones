@@ -119,12 +119,12 @@ datos_pos |>
   geom_bar(stat = "identity", color="black", size=1) +
   geom_text(aes(y = pos, label = etiqueta), color = "white", size = 2.5) +
   labs(
-    title = "Gráfica 4: Distribución apilada del nivel educativo en México (2005–2023)",
-    subtitle = "Porcentaje de población por nivel de educación alcanzado",
+    #title = "Gráfica 4: Distribución apilada del nivel educativo en México (2005–2023)",
+    #subtitle = "Porcentaje de población por nivel de educación alcanzado",
     x = "Año", 
-    y = "Porcentaje total", 
+    y = "Porcentaje (%)", 
     fill = "Nivel educativo",
-    caption = "Fuente: Elaboración propia con datos de la OCDE. Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población de 25-64 años"
+    #caption = "Fuente: Elaboración propia con datos de la OCDE. Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población de 25-64 años"
   )  +
   theme_classic() +
   theme(
@@ -135,7 +135,7 @@ datos_pos |>
     legend.title = element_text(face = "bold"),
     axis.text.x = element_text(angle = 45, hjust = 1)
   ) +
-  scale_y_continuous(breaks = seq(0, 100, by = 20))
+  scale_y_continuous(breaks = seq(0, 100, by = 20), labels = label_percent(scale = 1))
 
 
 
@@ -168,10 +168,10 @@ ggplot(datos_pos, aes(x = factor(año), y = valor, fill = nivel)) +
   geom_bar(stat = "identity", color="black", size=1) + 
   facet_wrap(~ país) +
   labs(
-    title = "Gráfica 5: Distribución educativa apilada: México vs OCDE (2005–2023)",
-    x = "Año", y = "Porcentaje total", fill = "Nivel educativo",
-    subtitle = "Porcentaje de población por nivel de educación alcanzado",
-    caption = "Fuente: Elaboración propia con datos de la OCDE. Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población de 25-64 años"
+    #title = "Gráfica 5: Distribución educativa apilada: México vs OCDE (2005–2023)",
+    x = "Año", y = "Porcentaje (%)", fill = "Nivel educativo",
+    #subtitle = "Porcentaje de población por nivel de educación alcanzado",
+    #caption = "Fuente: Elaboración propia con datos de la OCDE. Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población de 25-64 años"
   ) +
   theme_classic() +
   theme(legend.position = "top")+
@@ -186,7 +186,7 @@ ggplot(datos_pos, aes(x = factor(año), y = valor, fill = nivel)) +
     legend.title = element_text(face = "bold"),
     axis.text.x = element_text(angle = 45, hjust = 1)
   ) +
-  scale_y_continuous(breaks = seq(0, 100, by = 20))
+  scale_y_continuous(breaks = seq(0, 100, by = 20), labels = label_percent(scale = 1))
 
 
 
@@ -243,11 +243,11 @@ ggplot(Ocde_world_2023_long, aes(x = `Reference area`, y = porcentaje, fill = ni
     show.legend = FALSE
   )+
   labs(
-    title = "Gráfica 6: Nivel educativo en países OCDE y seleccionados (2023)",    
-    subtitle = "Porcentaje de población por nivel de educación alcanzado",
-    caption = "Fuente: Elaboración propia con datos de la OCDE. Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población de 25-64 años",
+    #title = "Gráfica 6: Nivel educativo en países OCDE y seleccionados (2023)",    
+    #subtitle = "Porcentaje de población por nivel de educación alcanzado",
+    #caption = "Fuente: Elaboración propia con datos de la OCDE. Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población de 25-64 años",
     x = "País",
-    y = "Porcentaje",
+    y = "Porcentaje (%)",
     fill = "Nivel educativo"
   ) +
   theme_classic() +
@@ -266,7 +266,8 @@ ggplot(Ocde_world_2023_long, aes(x = `Reference area`, y = porcentaje, fill = ni
       "Upper secondary or post-secondary non-tertiary education" = "#00BFFF",
       "Tertiary education" = "mediumpurple"
     )
-  )  
+  )  +
+  scale_y_continuous(breaks = seq(0, 100, by = 20), labels = label_percent(scale = 1))
 
 
 Ocde_bank_world_2023 <- read_excel("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/OCDE data/Educational attainment distribution 2023 World.xlsx", 
@@ -282,11 +283,13 @@ ggplot(Ocde_bank_world_2023,
        aes(x = `Tertiary education`, y = `GDP Per capita`)) +
   geom_point(color = "blue", size = 3, alpha = 0.7) +
   geom_smooth(method = "lm", color = "red", se = TRUE) +
-  labs(title = "Gráfica 7: Relación entre educación terciaria y PIB per cápita",
-       subtitle = "A precios constantes de 2015 en dolares ", 
+  labs(
+    #title = "Gráfica 7: Relación entre educación terciaria y PIB per cápita",
+       #subtitle = "A precios constantes de 2015 en dolares ", 
        x = "Porcentaje con educación terciaria",
        y = "PIB per cápita (USD)",
-       caption = "Fuente: Elaboración propia con datos de la OCDE y World Bank Group.\nDatos extraídos el 25/05/2025")+
+       #caption = "Fuente: Elaboración propia con datos de la OCDE y World Bank Group.\nDatos extraídos el 25/05/2025")
+  )+
        theme_classic() +
   # Añadir etiquetas a los puntos extremos
   ggrepel::geom_text_repel(

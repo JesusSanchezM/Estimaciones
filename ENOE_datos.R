@@ -194,11 +194,11 @@ Escolaridad_filtrada %>%
 
 # Procesamiento de datos
 Escolaridad_ordenada <- Escolaridad_filtrada %>%
-  filter(!nivel_escolaridad %in% c("Maestría", "Doctorado")) %>%
+  filter(!nivel_escolaridad %in% c("Maestría", "Doctorado", "Normal")) %>%
   mutate(grupo_escolaridad = case_when(
     nivel_escolaridad %in% c("Ninguno") ~ "1. Ninguno",
     nivel_escolaridad %in% c("Preescolar", "Primaria", "Secundaria") ~ "2. Menor a preparatoria",
-    nivel_escolaridad %in% c("Preparatoria o bachillerato", "Normal") ~ "3. Preparatoria y normal",
+    nivel_escolaridad %in% c("Preparatoria o bachillerato") ~ "3. Preparatoria y bachillerato",
     nivel_escolaridad %in% c("Carrera técnica", "Profesional") ~ "4. Carrera técnica y profesional",
     TRUE ~ as.character(nivel_escolaridad)
   )) %>%
@@ -206,7 +206,7 @@ Escolaridad_ordenada <- Escolaridad_filtrada %>%
     mutate(grupo_escolaridad = fct_relevel(grupo_escolaridad, 
                                            "1. Ninguno",
                                            "2. Menor a preparatoria",
-                                           "3. Preparatoria y normal",
+                                           "3. Preparatoria y bachillerato",
                                            "4. Carrera técnica y profesional")) %>%
     group_by(anio, grupo_escolaridad) %>%
     summarise(suma_total = sum(suma_factor_expansion),
@@ -217,13 +217,14 @@ Escolaridad_ordenada <- Escolaridad_filtrada %>%
   ggplot(Escolaridad_ordenada, aes(x = factor(anio), y = proporcion_total, 
                                    fill = grupo_escolaridad)) +
     geom_bar(stat = "identity", position = "stack", color="black", size=1) +
-    labs(title = "Gráfica 2: Distribución de Niveles de Escolaridad por Año",
-         subtitle = "(Porcentaje de la población mayor a 25 años)",
-         x = "Año",
-         y = "Proporción",
-         fill = "Nivel de Escolaridad", 
-         caption = "Elaboración propia con datos de la Encuesta Nacional de Ocupación y Empleo (ENOE) \nNota: Se excluyen los datos de Maestría y Doctorado") +
-    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+    labs(x = "Año",
+         y = "Porcentaje (%)",
+         fill = "Nivel de Escolaridad"
+         #title = "Gráfica 2: Distribución de Niveles de Escolaridad por Año",
+         #subtitle = "(Porcentaje de la población mayor a 25 años)",
+         #caption = "Elaboración propia con datos de la Encuesta Nacional de Ocupación y Empleo (ENOE) \nNota: Se excluyen los datos de Maestría y Doctorado") +
+    )+
+         scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
     scale_fill_manual(values = c("#FF69B4", "#00BFFF", "mediumpurple", "#FFA07A")) +  # Colores distintivos
     theme_classic() +
     theme(
@@ -417,7 +418,7 @@ Asistencia_todos <- Asistencia_todos |>
 ggplot(data=Asistencia_todos, aes(x = cs_p17_rotulo, y = suma_factor_expansion, fill = factor(anio))) +
   geom_col(position = "dodge", color="black") +
   labs(
-    title = "Asistencia por año y tipo de respuesta",
+    #title = "Asistencia por año y tipo de respuesta",
     x = "Respuesta",
     y = "Total ponderado",
     fill = "Año"
@@ -437,9 +438,9 @@ Asistencia_todos |>
       x = "Respuesta",
       y = "Total ponderado",
       fill = "Año",
-      title = "Gráfica 3: Asistencia por año y tipo de respuesta (2018–2024)",
-      subtitle = "(Población)",
-      caption = "Fuente: Elaboración propia con datos de INEGI. Encuesta de Ocupación y Empleo (ENOE) Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población de entre 15 y 24 años"
+      #title = "Gráfica 3: Asistencia por año y tipo de respuesta (2018–2024)",
+      #subtitle = "(Población)",
+      #caption = "Fuente: Elaboración propia con datos de INEGI. Encuesta de Ocupación y Empleo (ENOE) Datos extraídos el 25/05/2025\nNota: Porcentajes calculados sobre población de entre 15 y 24 años"
     ) +
     scale_y_continuous(labels = label_comma()) +
     theme_classic() +  
@@ -452,7 +453,57 @@ Asistencia_todos |>
       axis.text.x = element_text(angle = 45, hjust = 1)
     ) 
 
-  
+
+
+
+
+
+
+Asistencia_todos |>
+  filter(cs_p17 != 9) |>
+  mutate(
+    cs_p17_rotulo = recode(cs_p17,
+                           `1` = "Sí",
+                           `2` = "No")
+  ) |>
+  group_by(anio) |>
+  mutate(
+    total_anio = sum(suma_factor_expansion),
+    porcentaje = suma_factor_expansion / total_anio * 100
+  ) |>
+  ungroup() |>
+  group_by(anio) |>
+  arrange(cs_p17_rotulo) |>  # Para que las etiquetas estén en orden
+  mutate(
+    pos = cumsum(porcentaje) - 0.5 * porcentaje
+  ) |>
+  ggplot(aes(x = factor(anio), y = porcentaje, fill = cs_p17_rotulo)) +
+  geom_col(color = "black", size = 1) +
+  geom_text(aes(y = pos, label = paste0(round(porcentaje, 1), "%")),
+            color = "black", size = 5) +
+  labs(
+    #title = "Asistencia escolar por año",
+    #subtitle = "Distribución apilada por tipo de respuesta (2018–2024)",
+    x = "Año", 
+    y = "Porcentaje (%)", 
+    fill = "Respuesta",
+    #caption = "Fuente: Elaboración propia con datos de INEGI. Encuesta de Ocupación y Empleo (ENOE)\nNota: Población de entre 15 y 24 años. Datos extraídos el 25/05/2025"
+  ) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 14),
+    plot.subtitle = element_text(hjust = 0.5, size = 10),
+    plot.caption = element_text(hjust = 0, size = 8, color = "gray40"),
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold", size = 13),
+    legend.text = element_text(size = 12),
+    legend.key.size = unit(1.2, "cm"),  # Aumenta tamaño de recuadros
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )+
+  scale_y_continuous(breaks = seq(0, 100, by = 20), labels = label_percent(scale = 1))
+
+
+
 
 
 

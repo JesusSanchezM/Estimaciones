@@ -58,9 +58,10 @@ ggplot(mapa_largo) +
   ) +
   facet_wrap(~ Tipo_Escuela, ncol = 2) +  # Dos columnas para comparar
   labs(
-    title = "Mapa 1: Distribución de Escuelas por Nivel Educativo",
-    subtitle ="(Número de escuelas)",
-    caption = "Fuente: Elaboración propia con datos del \nSistema Interactivo de Consulta de Estadística Educativa") +
+    #title = "Mapa 1: Distribución de Escuelas por Nivel Educativo",
+    #subtitle ="(Número de escuelas)",
+    #caption = "Fuente: Elaboración propia con datos del \nSistema Interactivo de Consulta de Estadística Educativa") +
+  )+
   theme_void() +
   theme(    plot.title = element_text(face = "bold", hjust = 0.5, size = 14),
             plot.subtitle = element_text(hjust = 0.5, size = 10),
