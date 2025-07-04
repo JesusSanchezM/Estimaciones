@@ -1,3 +1,6 @@
+
+library(sf)
+library(readr)
 library(readxl)
 library(tidyverse)
 
@@ -5,9 +8,7 @@ library(tidyverse)
 Datos_juntos <- read_excel("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/SICEE/Datos juntos.xlsx")
 
 
-library(dplyr)
 library(sf)
-library(ggplot2)
 library(readr)
 
 # Asegúrate que Entidad esté en mayúsculas y sin tildes, como en los shapefiles
@@ -34,7 +35,7 @@ ggplot(data = mapa_completo) +
     title = "Número de Escuelas de Media Superior por Estado",
     caption = "Fuente: datos_juntos"
   ) +
-  theme_classic()
+  theme_void()
 
 library(ggplot2)
 library(sf)
