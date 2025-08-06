@@ -7,6 +7,7 @@
   library(haven) #abrir dta
   library(tidyverse)
   library(scales)  # Para label_comma()
+  library(psych)
   
 }
 
@@ -15,17 +16,16 @@
 #-----------------------------------
 
 {
-  poblacion_2018_2018 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENIGH_datos/enigh2018_ns_poblacion_csv/poblacion.csv")
-  View(poblacion_2018)
-  str(poblacion_2018$edad)
-  library(psych)
-  describe(poblacion_2018$edad)
-  table(poblacion_2018$asis_esc)
+  poblacion_2024_2024 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENIGH_datos/enigh2024_ns_poblacion_csv/poblacion.csv")
+  View(poblacion_2024_2024)
+  str(poblacion_2024_2024$edad)
+  describe(poblacion_2024_2024$edad)
+  table(poblacion_2024_2024$asis_esc)
 }
 
 
 ggplot(
-  data = poblacion_2018 %>%
+  data = poblacion_2024 %>%
     filter(edad >= 15 & edad <= 24 & !is.na(asis_esc)) %>%
     mutate(asis_esc = factor(asis_esc, levels = c(1, 2), labels = c("Asiste", "No asiste"))),
   aes(x = as.factor(edad), fill = asis_esc)
@@ -42,7 +42,7 @@ ggplot(
 
 
 
-poblacion_2018_1 <- poblacion_2018 %>%
+poblacion_2024_1 <- poblacion_2024 %>%
   filter(edad >= 15 & edad <= 24) %>%
   filter(parentesco == 301) %>%
   mutate(padre_madre = case_when(
@@ -52,10 +52,10 @@ poblacion_2018_1 <- poblacion_2018 %>%
     madre_hog == 1 & padre_hog == 1 ~ 4   # Ambos
   ))
 
-table(poblacion_2018_1$padre_madre)
+table(poblacion_2024_1$padre_madre)
 
 
-poblacion_2018_2 <- poblacion_2018_1 %>%
+poblacion_2024_2 <- poblacion_2024_1 %>%
   filter(edad >= 15 & edad <= 24, !is.na(asis_esc)) %>%
   mutate(
     asis_esc = factor(asis_esc, levels = c(1, 2), labels = c("Asiste", "No asiste")),
@@ -66,7 +66,7 @@ poblacion_2018_2 <- poblacion_2018_1 %>%
 
 
 # Preparar los datos con conteo y proporciones
-datos_graf <- poblacion_2018_1 %>%
+datos_graf <- poblacion_2024_1 %>%
   filter(edad >= 15 & edad <= 24, !is.na(asis_esc)) %>%
   mutate(
     asis_esc = factor(asis_esc, levels = c(1, 2), labels = c("Asiste", "No asiste")),
@@ -96,5 +96,3 @@ ggplot(datos_graf, aes(x = as.factor(edad), y = prop, fill = asis_esc)) +
     fill = "Asistencia escolar"
   ) +
   theme_classic()
-
-

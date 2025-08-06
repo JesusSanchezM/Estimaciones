@@ -235,7 +235,7 @@ Escolaridad_ordenada <- Escolaridad_filtrada %>%
       legend.title = element_text(face = "bold"),
       axis.text.x = element_text(angle = 45, hjust = 1)
     ) 
-
+ 
 
 
 
