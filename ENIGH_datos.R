@@ -15,15 +15,17 @@
 #-----------------------------------
 
 {
-  poblacion_2018_2018 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENIGH_datos/enigh2018_ns_poblacion_csv/poblacion.csv")
+  poblacion_2018 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENIGH_datos/enigh2018_ns_poblacion_csv/poblacion.csv")
   View(poblacion_2018)
+  poblacion_2018 <- poblacion_2018 %>%  rename(folioviv = ï..folioviv)
+  con_hogar_2018 <- read.csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENIGH_datos/enigh2018_ns_concentradohogar_csv/concentradohogar.csv")
+  con_hogar_2018 <- con_hogar_2018 %>%  rename(folioviv = ï..folioviv)
   str(poblacion_2018$edad)
-  library(psych)
   describe(poblacion_2018$edad)
   table(poblacion_2018$asis_esc)
 }
 
-
+{
 ggplot(
   data = poblacion_2018 %>%
     filter(edad >= 15 & edad <= 24 & !is.na(asis_esc)) %>%
@@ -39,7 +41,7 @@ ggplot(
     fill = "Asistencia escolar"
   ) +
   theme_classic()
-
+}
 
 
 poblacion_2018_1 <- poblacion_2018 %>%
@@ -64,9 +66,9 @@ poblacion_2018_2 <- poblacion_2018_1 %>%
 
 
 
-
+{
 # Preparar los datos con conteo y proporciones
-datos_graf <- poblacion_2018_1 %>%
+datos_graf_2018 <- poblacion_2018_1 %>%
   filter(edad >= 15 & edad <= 24, !is.na(asis_esc)) %>%
   mutate(
     asis_esc = factor(asis_esc, levels = c(1, 2), labels = c("Asiste", "No asiste")),
@@ -82,7 +84,7 @@ datos_graf <- poblacion_2018_1 %>%
   )
 
 # Graficar con porcentajes dentro de las barras
-ggplot(datos_graf, aes(x = as.factor(edad), y = prop, fill = asis_esc)) +
+ggplot(datos_graf_2018, aes(x = as.factor(edad), y = prop, fill = asis_esc)) +
   geom_bar(stat = "identity", position = "fill", color = "black", size = 1) +
   geom_text(aes(label = label), 
             position = position_fill(vjust = 0.5), 
@@ -90,11 +92,33 @@ ggplot(datos_graf, aes(x = as.factor(edad), y = prop, fill = asis_esc)) +
   scale_y_continuous(labels = percent_format()) +
   facet_wrap(~padre_madre) +
   labs(
-    title = "Proporción de asistencia escolar por edad (15-24 años) según presencia de padres",
+    title = "Proporción de asistencia escolar por edad (15-24 años) según presencia de padres 2018",
     x = "Edad",
     y = "Porcentaje",
     fill = "Asistencia escolar"
   ) +
   theme_classic()
+}
 
+# Unir por folio de vivienda y folio de hogar
+datos_unidos_2018 <- con_hogar_2018 %>%
+  inner_join(poblacion_2018_2, by = c("folioviv", "foliohog"), multiple="all")
+
+#poblacion es y
+#concentrado del hogar es x
+
+#print(datos_unidos)
+
+sum(datos_unidos_2018$factor)
+
+
+datos_unidos_2018 %>%
+  group_by(padre_madre) %>%
+  summarise(total_poblacion = sum(factor, na.rm = TRUE))
+
+table(datos_unidos_2018$padre_madre)
+
+sum((datos_unidos_2018 %>%
+      group_by(padre_madre) %>%
+      summarise(total_poblacion = sum(factor, na.rm = TRUE)))$total_poblacion)
 
