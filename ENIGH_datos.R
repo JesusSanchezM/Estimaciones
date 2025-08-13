@@ -25,24 +25,6 @@
   table(poblacion_2018$asis_esc)
 }
 
-{
-ggplot(
-  data = poblacion_2018 %>%
-    filter(edad >= 15 & edad <= 24 & !is.na(asis_esc)) %>%
-    mutate(asis_esc = factor(asis_esc, levels = c(1, 2), labels = c("Asiste", "No asiste"))),
-  aes(x = as.factor(edad), fill = asis_esc)
-) +
-  geom_bar(position = "fill", color="black", size=1) +
-  scale_y_continuous(labels = scales::percent_format()) +
-  labs(
-    title = "Proporción de asistencia escolar por edad (15 a 24 años)",
-    x = "Edad",
-    y = "Porcentaje",
-    fill = "Asistencia escolar"
-  ) +
-  theme_classic()
-}
-
 
 poblacion_2018_1 <- poblacion_2018 %>%
   filter(edad >= 15 & edad <= 24) %>%
@@ -111,7 +93,6 @@ datos_unidos_2018 <- con_hogar_2018 %>%
 
 sum(datos_unidos_2018$factor)
 
-
 datos_unidos_2018 %>%
   group_by(padre_madre) %>%
   summarise(total_poblacion = sum(factor, na.rm = TRUE))
@@ -121,4 +102,98 @@ table(datos_unidos_2018$padre_madre)
 sum((datos_unidos_2018 %>%
       group_by(padre_madre) %>%
       summarise(total_poblacion = sum(factor, na.rm = TRUE)))$total_poblacion)
+
+#-------------------------
+#-------DEMOGRAFÍA--------
+#-------------------------
+
+#SEXO
+{
+datos_unidos_2018 %>%
+  group_by(sexo, edad, asis_esc) %>%
+  summarise(total_personas = sum(factor, na.rm = TRUE), .groups = "drop") %>%
+  group_by(sexo, edad) %>%
+  mutate(
+    prop = total_personas / sum(total_personas),
+    porcentaje = round(prop * 100, 1),
+    etiqueta = paste0(porcentaje, "%"),
+    sexo = factor(sexo, levels = c(1, 2), labels = c("Hombre", "Mujer")),
+    asis_esc = factor(asis_esc)
+  ) %>%
+  ggplot(aes(x = as.factor(edad), y = prop, fill = asis_esc)) +
+  geom_col(color = "black", size = 0.3) +  # igual que geom_bar(stat="identity")
+  geom_text(aes(label = ifelse(porcentaje > 5, etiqueta, "")),  # solo etiqueta si >5% para evitar saturar
+            position = position_stack(vjust = 0.5),
+            size = 3, color = "white") +
+  facet_wrap(~ sexo) +
+  labs(x = "Edad", y = "Proporción", fill = "Asistencia escolar") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+}
+
+# Total de población
+{
+  datos_unidos_2018 %>%
+    group_by(tot_integ, edad, asis_esc) %>%
+    summarise(total_personas = sum(factor, na.rm = TRUE), .groups = "drop") %>%
+    group_by(tot_integ, edad) %>%
+    mutate(
+      prop = total_personas / sum(total_personas),
+      porcentaje = round(prop * 100, 1),
+      etiqueta = paste0(porcentaje, "%"),
+      asis_esc = factor(asis_esc)
+    ) %>%
+    ggplot(aes(x = as.factor(edad), y = prop, fill = asis_esc)) +
+    geom_col(color = "black", size = 0.3)  +
+    facet_wrap(~ tot_integ) +
+    labs(x = "Edad", y = "Proporción", fill = "Asistencia escolar") +
+    theme_classic() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+  
+  datos_unidos_2018 %>%
+    pull(tot_integ) %>% 
+    table()
+  
+  datos_unidos_2018 %>%
+    group_by(tot_integ) %>%
+    summarise(total_poblacion = sum(factor, na.rm = TRUE))
+
+
+ggplot(datos_unidos_2018 %>% group_by(tot_integ) %>% summarise(total_poblacion = sum(factor, na.rm = TRUE)), 
+       aes(x = as.factor(tot_integ), y = total_poblacion, fill = as.factor(tot_integ))) + 
+  geom_col(show.legend = FALSE) + 
+  geom_text(aes(label = scales::comma(total_poblacion)), vjust = -0.3, size = 3.5) +
+  labs(x = "Integrantes del hogar", y = "Total población", title = "Población por tamaño de hogar") + 
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+# Sin factor de expansión
+  ggplot(datos_unidos_2018 %>% 
+           group_by(tot_integ) %>% 
+           summarise(total_poblacion = n()), 
+         aes(x = as.factor(tot_integ), y = total_poblacion, fill = as.factor(tot_integ))) + 
+    geom_col(show.legend = FALSE) + 
+    geom_text(aes(label = scales::comma(total_poblacion)), vjust = -0.3, size = 3.5) +
+    labs(x = "Integrantes del hogar", y = "Total población (conteo registros)", 
+         title = "Población por tamaño de hogar (sin factor de expansión)") + 
+    theme_classic() +
+    theme(plot.title = element_text(hjust = 0.5))
+  
+
+# Porcentaje
+ggplot(datos_unidos_2018 %>% group_by(tot_integ) %>% summarise(total_poblacion = sum(factor, na.rm = TRUE)) %>% 
+         mutate(porcentaje = 100 * total_poblacion / sum(total_poblacion)), 
+       aes(x = as.factor(tot_integ), y = porcentaje, fill = as.factor(tot_integ))) + 
+  geom_col(show.legend = FALSE) + 
+  geom_text(aes(label = paste0(round(porcentaje, 2), "%")), vjust = -0.3, size = 3.5) +
+  labs(x = "Integrantes del hogar", y = "Porcentaje", title = "Porcentaje por tamaño de hogar") + 
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5))
+}
+
+
+
+
+
+
 
