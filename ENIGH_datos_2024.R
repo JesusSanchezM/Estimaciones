@@ -213,7 +213,112 @@ datos_unidos_2024 %>%
     theme(plot.title = element_text(hjust = 0.5))
 }
 
-
+#Ingreso corriente
+{
+  
+  # --- 1) Limpieza y transformación de datos ---
+  df_clean_2024 <- datos_unidos_2024 %>%
+    select(ing_cor, edad, asis_esc) %>%
+    filter(
+      !is.na(ing_cor), 
+      !is.na(edad), 
+      !is.na(asis_esc),
+      edad >= 15, edad <= 24
+    ) %>%
+    filter(
+      ing_cor >= quantile(ing_cor, 0.25, na.rm = TRUE) - 1.5 * IQR(ing_cor, na.rm = TRUE),
+      ing_cor <= quantile(ing_cor, 0.75, na.rm = TRUE) + 1.5 * IQR(ing_cor, na.rm = TRUE)
+    ) %>%
+    mutate(
+      edad = factor(edad),
+      asis_esc = factor(asis_esc, labels = c("No asiste", "Asiste"))
+    )
+  
+  # --- 2) Funciones auxiliares ---
+  # Formato de tabla
+  format_table <- function(data, caption = "") {
+    data %>%
+      kable("html", caption = caption) %>%
+      kable_styling(
+        full_width = FALSE,
+        bootstrap_options = c("striped", "hover", "condensed")
+      )
+  }
+  
+  # Estadísticas resumen
+  get_summary_stats <- function(data, group_var = NULL) {
+    if (!is.null(group_var)) data <- data %>% group_by(across({{group_var}}))
+    data %>%
+      summarise(
+        n = n(),
+        Media = mean(ing_cor),
+        Mediana = median(ing_cor),
+        SD = sd(ing_cor),
+        Q1 = quantile(ing_cor, 0.25),
+        Q3 = quantile(ing_cor, 0.75),
+        Mínimo = min(ing_cor),
+        Máximo = max(ing_cor),
+        .groups = "drop"
+      )
+  }
+  
+  # --- 3) Tablas descriptivas ---
+  # Tabla: asistencia escolar
+  df_clean_2024 %>%
+    count(asis_esc, name = "n") %>%
+    mutate(Porcentaje = round(100 * n / sum(n), 1)) %>%
+    format_table("Frecuencia y porcentaje de asistencia escolar")
+  
+  # Tabla: resumen general de ingresos
+  get_summary_stats(df_clean_2024) %>%
+    format_table("Resumen general de ingreso corriente")
+  
+  # Tabla: ingresos por asistencia escolar
+  get_summary_stats(df_clean_2024, "asis_esc") %>%
+    format_table("Resumen de ingreso por asistencia escolar")
+  
+  # Tabla: ingresos por edad y asistencia
+  get_summary_stats(df_clean_2024, c("edad", "asis_esc")) %>%
+    format_table("Resumen de ingreso por edad y asistencia escolar")
+  
+  # --- 4) Visualizaciones ---
+  # Boxplot ingresos por edad y asistencia
+  ggplot(df_clean_2024, aes(x = edad, y = ing_cor, fill = asis_esc)) +
+    geom_boxplot(position = position_dodge2(width = 0.75, preserve = "single"), outlier.alpha = 0.2) +
+    scale_y_continuous(labels = comma) +
+    labs(
+      title = "Distribución de ingresos por edad y asistencia escolar",
+      subtitle = "Población de 15 a 24 años",
+      x = "Edad", y = "Ingreso corriente", fill = "Asistencia escolar"
+    ) +
+    theme_classic() +
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+          plot.subtitle = element_text(hjust = 0.5),
+          legend.position = "top")
+  
+  # Histogramas ingresos por asistencia
+  ggplot(df_clean_2024, aes(x = ing_cor, fill = asis_esc)) +
+    geom_histogram(
+      bins = 30,
+      color = "white",
+      alpha = 0.7,
+      position = "identity" # superpone las barras
+    ) +
+    scale_fill_manual(values = c("No asiste" = "#F8766D", "Asiste" = "#00BFC4")) +
+    scale_x_continuous(labels = scales::comma) +
+    labs(
+      title = "Distribución de ingresos por asistencia escolar",
+      x = "Ingreso corriente",
+      y = "Frecuencia",
+      fill = "Asistencia escolar"
+    ) +
+    theme_classic() +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold"),
+      legend.position = "top"
+    )
+  
+}
 
 
 
