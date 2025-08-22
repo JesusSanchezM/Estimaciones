@@ -503,9 +503,22 @@ Asistencia_todos |>
   scale_y_continuous(breaks = seq(0, 100, by = 20), labels = label_percent(scale = 1))
 
 
+table(SDEM_2024$t_loc_men)
+table(SDEM_2024$t_loc_tri)
+table(SDEM_2024$ur)
 
 
+SDEM_2024 %>% filter(cd_a==01) %>% pull(mun) %>%  table()
 
+table(SDEM_2024$ur)
+
+table(SDEM_2024$t_loc_tri)
+
+table(SDEM_2024$cd_a)
+
+SDEM_2024 %>%  filter(mun==21128)
+
+table(SDEM_2024$mun)
 
 
 
