@@ -100,24 +100,6 @@ ggplot(datos_padres, aes(x = as.factor(edad), y = prop, fill = asis_esc)) +
   ) +
   theme_classic()
 
-library(dplyr)
-library(tidyr)
-
-# Pivotear para tener 2018 y 2024 en columnas
-variacion_padres <- datos_padres %>%
-  select(año, padre_madre, edad, asis_esc, prop) %>%
-  pivot_wider(names_from = año, values_from = prop, names_prefix = "prop_") %>%
-  mutate(
-    variacion_pct = (prop_2024 - prop_2018) / prop_2018 * 100
-  )
-
-# Ver tabla ordenada
-variacion_padres %>%
-  arrange(padre_madre, edad, asis_esc)
-
-variacion_padres <- variacion_padres %>%
-  mutate(variacion_pct = round(variacion_pct, 2))
-
 }
 
 #Sexo
@@ -263,3 +245,171 @@ ggplot(df_combinado,
           axis.text.x = element_text(angle = 45, hjust = 1))
   
 }
+
+#Ingreso
+{
+  # 1. Unir bases
+  datos_var2 <- d %>%
+    rename(total_2018 = total_poblacion) %>%
+    inner_join(
+      a %>% rename(total_2024 = total_poblacion),
+      by = c("padre_madre", "edad")
+    ) %>%
+    # 2. Calcular variación porcentual
+    mutate(
+      variacion_pct = round(((total_2024 - total_2018) / total_2018) * 100, 1)
+    )
+  
+  datos_var2_filtro <- datos_var2 %>%
+    filter(total_2018 >= 2000)
+  
+  
+  # 3. Crear mapa de calor
+  ggplot(datos_var2_filtro, aes(x = padre_madre, y = factor(edad))) +
+    geom_tile(aes(fill = variacion_pct), color = "black") +
+    geom_text(aes(label = paste0(variacion_pct, "%")), 
+              color = "black", size = 3) +
+    scale_fill_gradient2(
+      low = "red", high = "green", mid = "white",
+      midpoint = 0, name = "Variación %"
+    ) +
+    labs(
+      x = "Condición de padres",
+      y = "Edad (15–24 años)"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      panel.grid = element_blank()
+    )
+  
+  library(dplyr)
+  library(ggplot2)
+  
+  # Agrupar edades en dos bloques
+  datos_var_agrup <- datos_var2 %>%
+    mutate(grupo_edad = ifelse(edad >= 15 & edad <= 19, "15-19", "20-24")) %>%
+    group_by(padre_madre, grupo_edad) %>%
+    summarise(
+      total_2018 = sum(total_2018, na.rm = TRUE),
+      total_2024 = sum(total_2024, na.rm = TRUE),
+      .groups = "drop"
+    ) %>%
+    mutate(
+      variacion_pct = round(((total_2024 - total_2018) / total_2018) * 100, 1)
+    )
+  
+  # Mapa de calor con grupos de edad
+  ggplot(datos_var_agrup, aes(x = padre_madre, y = grupo_edad)) +
+    geom_tile(aes(fill = variacion_pct), color = "black") +
+    geom_text(aes(label = paste0(variacion_pct, "%")),
+              color = "black", size = 4) +
+    scale_fill_gradient2(low = "red", high = "green", mid = "white",
+                         midpoint = 0, name = "Variación %") +
+    labs(
+      x = "Condición de padres",
+      y = "Grupo de edad",
+      title = "Variación porcentual de población (2018–2024)"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      panel.grid = element_blank()
+    )
+  
+}
+
+#Comparativa de 2018 y 2024 ingreso 
+{
+  # --- 1) Limpieza de datos 2018 ---
+  df_clean_2018 <- datos_unidos_2018 %>%
+    select(ing_cor, edad, asis_esc) %>%
+    filter(
+      !is.na(ing_cor), 
+      !is.na(edad), 
+      !is.na(asis_esc),
+      edad >= 15, edad <= 24
+    ) %>%
+    filter(
+      ing_cor >= quantile(ing_cor, 0.25, na.rm = TRUE) - 1.5 * IQR(ing_cor, na.rm = TRUE),
+      ing_cor <= quantile(ing_cor, 0.75, na.rm = TRUE) + 1.5 * IQR(ing_cor, na.rm = TRUE)
+    ) %>%
+    mutate(
+      edad = as.integer(edad),
+      asis_esc = factor(asis_esc, labels = c("No asiste", "Asiste"))
+    )
+  
+  # --- 2) Limpieza de datos 2024 ---
+  df_clean_2024 <- datos_unidos_2024 %>%
+    select(ing_cor, edad, asis_esc) %>%
+    filter(
+      !is.na(ing_cor), 
+      !is.na(edad), 
+      !is.na(asis_esc),
+      edad >= 15, edad <= 24
+    ) %>%
+    filter(
+      ing_cor >= quantile(ing_cor, 0.25, na.rm = TRUE) - 1.5 * IQR(ing_cor, na.rm = TRUE),
+      ing_cor <= quantile(ing_cor, 0.75, na.rm = TRUE) + 1.5 * IQR(ing_cor, na.rm = TRUE)
+    ) %>%
+    mutate(
+      edad = as.integer(edad),
+      asis_esc = factor(asis_esc, labels = c("No asiste", "Asiste"))
+    )
+  
+  # --- 3) Función para resumen ---
+  get_summary_stats_age <- function(data) {
+    data %>%
+      group_by(edad, asis_esc) %>%
+      summarise(
+        Media = mean(ing_cor, na.rm = TRUE),
+        Mediana = median(ing_cor, na.rm = TRUE),
+        .groups = "drop"
+      )
+  }
+  
+  # --- 4) Crear tablas por año ---
+  stats_2018 <- get_summary_stats_age(df_clean_2018) %>% mutate(año = 2018)
+  stats_2024 <- get_summary_stats_age(df_clean_2024) %>% mutate(año = 2024)
+  
+  # --- 5) Juntar y calcular variaciones ---
+  stats_both <- bind_rows(stats_2018, stats_2024)
+  
+  stats_variacion <- stats_both %>%
+    pivot_wider(
+      names_from = año, 
+      values_from = c(Media, Mediana)
+    ) %>%
+    mutate(
+      Var_pct_media   = 100 * (Media_2024 - Media_2018) / Media_2018,
+      Var_pct_mediana = 100 * (Mediana_2024 - Mediana_2018) / Mediana_2018
+    )
+  
+  # --- 6) Heatmap con variación porcentual (Media) ---
+  ggplot(stats_variacion, aes(x = asis_esc, y = as.factor(edad), fill = Var_pct_media)) +
+    geom_tile(color = "white") +
+    geom_text(aes(label = paste0(round(Var_pct_media, 1), "%")), color = "black", size = 3) +
+    scale_fill_gradient2(
+      low = "red"
+      high = "green",
+      midpoint = 0,
+      name = "Variación % (Media)"
+    ) +
+    labs(
+      title = "Variación porcentual del ingreso corriente (2018–2024)",
+      subtitle = "Por edad y asistencia escolar",
+      x = "Asistencia escolar",
+      y = "Edad"
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold"),
+      plot.subtitle = element_text(hjust = 0.5),
+      axis.text.x = element_text(face = "bold"))
+  
+}
+
+
+
+
+

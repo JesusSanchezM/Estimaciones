@@ -95,15 +95,13 @@ datos_unidos_2018 <- con_hogar_2018 %>%
 
 sum(datos_unidos_2018$factor)
 
-datos_unidos_2018 %>%
-  group_by(padre_madre) %>%
-  summarise(total_poblacion = sum(factor, na.rm = TRUE))
+d <-datos_unidos_2018 %>%
+  group_by(padre_madre, edad) %>%
+  summarise(total_poblacion = sum(factor.y, na.rm = TRUE))
+d
 
 table(datos_unidos_2018$padre_madre)
 
-sum((datos_unidos_2018 %>%
-      group_by(padre_madre) %>%
-      summarise(total_poblacion = sum(factor, na.rm = TRUE)))$total_poblacion)
 
 #-------------------------
 #-------DEMOGRAFÍA--------
@@ -267,7 +265,7 @@ ggplot(df_clean_2018, aes(x = edad, y = ing_cor, fill = asis_esc)) +
   geom_boxplot(position = position_dodge2(width = 0.75, preserve = "single"), outlier.alpha = 0.2) +
   scale_y_continuous(labels = comma) +
   labs(
-    title = "Distribución de ingresos por edad y asistencia escolar",
+    title = "Distribución de ingresos por edad y asistencia escolar (2018)",
     subtitle = "Población de 15 a 24 años",
     x = "Edad", y = "Ingreso corriente", fill = "Asistencia escolar"
   ) +

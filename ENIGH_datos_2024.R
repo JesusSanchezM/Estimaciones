@@ -121,10 +121,10 @@ which(factor.y != factor.x)
 
 detach(datos_unidos_2024)
 
-datos_unidos_2024 %>%
-  group_by(padre_madre) %>%
+a <- datos_unidos_2024 %>%
+  group_by(padre_madre, edad) %>%
   summarise(total_poblacion = sum(factor.y, na.rm = TRUE))
-
+a
 
 #-------------------------
 #-------DEMOGRAFÍA--------
@@ -287,7 +287,7 @@ datos_unidos_2024 %>%
     geom_boxplot(position = position_dodge2(width = 0.75, preserve = "single"), outlier.alpha = 0.2) +
     scale_y_continuous(labels = comma) +
     labs(
-      title = "Distribución de ingresos por edad y asistencia escolar",
+      title = "Distribución de ingresos por edad y asistencia escolar (2024)",
       subtitle = "Población de 15 a 24 años",
       x = "Edad", y = "Ingreso corriente", fill = "Asistencia escolar"
     ) +
@@ -307,7 +307,7 @@ datos_unidos_2024 %>%
     scale_fill_manual(values = c("No asiste" = "#F8766D", "Asiste" = "#00BFC4")) +
     scale_x_continuous(labels = scales::comma) +
     labs(
-      title = "Distribución de ingresos por asistencia escolar",
+      title = "Distribución de ingresos por asistencia escolar (2024)",
       x = "Ingreso corriente",
       y = "Frecuencia",
       fill = "Asistencia escolar"
