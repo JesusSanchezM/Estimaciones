@@ -1,22 +1,28 @@
 #-----------------------------------
 #---------- Librerías --------------
 #-----------------------------------
-library(dplyr)
-library(readr)
+
 library(readxl)
+library(readr) #abrir csv
+library(haven) #abrir dta
+library(tidyverse)
+library(scales)  # Para label_comma()
+library(psych)
 
 #-----------------------------------
 #---------- Datos ------------------
 #-----------------------------------
-# Ajusta rutas según tu PC
+{
 poblacion_2018_1 <- read_csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENIGH_datos/enigh2018_ns_poblacion_csv/poblacion.csv")
 con_hogar_2018_1 <- read_csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENIGH_datos/enigh2018_ns_concentradohogar_csv/concentradohogar.csv")
 poblacion_2024_1 <- read_csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENIGH_datos/enigh2024_ns_poblacion_csv/poblacion.csv")
 con_hogar_2024_1 <- read_csv("C:/Users/Jesus Sanchez/Desktop/ALEXIS/1. Estudio/Maestria BUAP - Economia/0. TESIS/Datos/ENIGH_datos/enigh2024_ns_concentradohogar_csv/concentradohogar.csv")
+}
 
 #-----------------------------------
 #---------- Preprocesamiento -------
 #-----------------------------------
+{
 preparar_poblacion <- function(df) {
   df <- df %>%
     filter(edad >= 15, edad <= 24, parentesco == 301) %>%
@@ -62,7 +68,11 @@ datos_2024 <- datos_2024 %>% mutate(año = 2024)
 datos_unidos <- bind_rows(datos_2018, datos_2024)
 
 write_csv(datos_unidos, "datos_unidos.csv")
+}
 
+#-----------------------------------
+#------------ Estadisticas-- -------
+#-----------------------------------
 #Asistencia escolar por edades
 {
 
@@ -114,6 +124,63 @@ write_csv(datos_unidos, "datos_unidos.csv")
     facet_wrap(~Sexo)
   
 }
+
+#Total de integrantes 
+{
+  # Crear el correlograma de asistencia escolar
+  datos_unidos %>%
+    mutate(
+      tot_integ = ifelse(tot_integ > 9, "10 o más", as.character(tot_integ)),
+      tot_integ= factor(tot_integ, levels = c(as.character(1:9), "10 o más"))
+      ) %>% 
+    # Filtrar solo los que asisten o no asisten (excluir NA si es necesario)
+    filter(!is.na(asis_esc)) %>%
+    # Agrupar por las variables relevantes
+    group_by(año, tot_integ, edad) %>%
+    summarise(
+      total_personas = sum(factor, na.rm = TRUE),
+      asistentes = sum(factor[asis_esc == "Asiste"], na.rm = TRUE),
+      .groups = "drop"
+    ) %>%
+    # Calcular porcentaje de asistencia
+    mutate(
+      porcentaje_asistencia = round((asistentes / total_personas) * 100, 1)
+    ) %>%
+    # Crear el correlograma
+    ggplot(aes(x = as.factor(tot_integ), y = as.factor(edad))) +
+    geom_tile(aes(fill = porcentaje_asistencia), color = "black" ) +
+    geom_text(aes(label = paste0(porcentaje_asistencia, "%")), 
+              color = "black", size = 3) +
+    facet_wrap(~ año, ncol = 2) +
+    scale_fill_gradient2(low = "red", high = "green", 
+                         midpoint = 50, name = "% Asistencia") +
+    labs(
+      x = "Número de integrantes del hogar",
+      y = "Edad"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      panel.grid = element_blank())
+  
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
