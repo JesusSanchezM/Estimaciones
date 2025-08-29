@@ -1,15 +1,37 @@
-library(tidyverse)
+#Librerias
 
+library(readr) #abrir csv
+library(haven) #abrir dta
+library(tidyverse)
+library(scales)  # Para label_comma()
+library(psych)
 
 #Manejo de datos juntos 
 {
 datos_unidos_2018 <- datos_unidos_2018 %>%
-  rename(factor.y = factor)
+  rename(ump_2018 = upm)
+  
+datos_unidos_2018 <- datos_unidos_2018 %>%
+  rename(est_dis_2018 = est_dis)
+
+datos_unidos_2018 <- datos_unidos_2018 %>%
+  rename(factor_2018 = factor)
+
+datos_unidos_2024 <- datos_unidos_2024 %>%
+  rename(ump_2024 = upm.x)
+
+datos_unidos_2024 <- datos_unidos_2024 %>%
+  rename(est_dis_2024 = est_dis.x)
+
+datos_unidos_2024 <- datos_unidos_2024 %>%
+  rename(factor_2024 = factor.y)
+
 
 datos_unidos <- bind_rows(
   datos_unidos_2018 %>% mutate(año = 2018),
   datos_unidos_2024 %>% mutate(año = 2024)
 )
+
 
 datos_unidos <- datos_unidos %>%
   filter(!is.na(asis_esc)) %>%
